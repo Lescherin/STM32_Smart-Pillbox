@@ -1,0 +1,82 @@
+.map-container {
+  position: relative; /* 确保容器为相对定位 */
+  width: 100%;
+  height: 70vh; /* 使用视口高度单位 */
+  min-height: 500rpx; /* 最小高度保证在小屏幕上可见 */
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+// 按钮容器 - 添加 z-index 确保在地图之上
+.button-group {
+  position: absolute;
+  right: 20rpx;
+  bottom: 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+  z-index: 1000; /* 提高层级 */
+}
+
+// 重置 UniApp 按钮默认样式
+button {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  line-height: 1;
+  
+  &::after {
+    display: none; /* 移除微信小程序按钮的默认边框 */
+  }
+}
+
+.locate-btn, .history-btn {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  border: none; /* 移除边框 */
+  
+  /* 添加按压效果 */
+  &:active {
+    transform: scale(0.95);
+    opacity: 0.9;
+  }
+}
+
+.history-btn {
+  width: auto; /* 自适应宽度 */
+  height: 70rpx;
+  padding: 0 25rpx;
+  border-radius: 40rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0%;
+  
+  /* 添加文字样式 */
+  &::after {
+    content: none; /* 移除伪元素 */
+  }
+}
+.locate-btn {
+ width: auto; /* 自适应宽度 */
+ height: 70rpx;
+ padding: 0 25rpx;
+ border-radius: 40rpx;
+ font-size: 24rpx;
+ font-weight: 500;
+ color: #333;
+ 
+ /* 添加文字样式 */
+ &::after {
+   content: none; /* 移除伪元素 */
+ }
+}
