@@ -82,7 +82,7 @@ void Sensor_Task(void *argument){
         DS1302_read_realTime();                     // 读取DS1302实时时间
         taskEXIT_CRITICAL();
          
-        vTaskDelay(1000); 
+        vTaskDelay(1000);  
     }
 }
 
@@ -96,7 +96,7 @@ void Sensor_Task(void *argument){
 void Oled_Show(void *argument)
 {
     while(1) {
-				OLED_Clear();
+		OLED_Clear();
 			
         OLED_Printf(0,0,6,"T:%d   H:%d     ",DHT11_Data.temp	,DHT11_Data.humi);
         OLED_Printf(0,12,6,"Weight:%.1fg      ",Weight);
@@ -167,7 +167,7 @@ void ESP_SendTask(void *argument)
         
         strcat(josnstr,"}");
 				
-				// 通过MQTT发送数据到云端
+		// 通过MQTT发送数据到云端
         MQTT_PublishData(josnstr,0);
         vTaskDelay(1000);
     }
@@ -285,15 +285,6 @@ void alert_task(void *argument)
     
 }
 
-void StartDefaultTask(void *argument)
-{
-    for(;;){
-    
-
-        vTaskDelay(3000);
-    }
-}
-
 /**
 按键控制任务
 功能：处理按键事件，实现短按、长按、双击功能
@@ -332,6 +323,17 @@ void Key_Task(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
+
+void StartDefaultTask(void *argument)
+{
+    for(;;){
+    
+
+        vTaskDelay(3000);
+    }
+}
+
+
 
 /**
  * @brief MX_FREERTOS_Init 函数

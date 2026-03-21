@@ -22,6 +22,22 @@
 
 /* USER CODE BEGIN 0 */
 
+/**
+TCRT5000红外感应模块驱动 - ADC部分
+功能用途：
+- 检测药箱内药品是否存在
+- 通过ADC采集红外传感器的模拟信号
+- 当药品遮挡红外光线时，输出不同的电压值
+
+硬件连接：
+- 红外传感器模拟输出 -> PA0 (ADC1_IN0)
+
+工作原理：
+- TCRT5000发射红外光，当有物体反射时，接收管导通
+- 通过ADC采集模拟电压，判断药品是否存在
+- 电压值越低表示反射越强（有药品）
+
+*/
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;
@@ -115,42 +131,34 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 
 /* USER CODE BEGIN 1 */
 /**
- * @brief       ����ADCͨ������ʱ��
- * @param       adcx : adc���ָ��,ADC_HandleTypeDef
- * @param       ch   : ͨ����, ADC_CHANNEL_0~ADC_CHANNEL_17
- * @param       stime: ����ʱ��  0~7, ��Ӧ��ϵΪ:
- *   @arg       ADC_SAMPLETIME_1CYCLE_5, 1.5��ADCʱ������        ADC_SAMPLETIME_7CYCLES_5, 7.5��ADCʱ������
- *   @arg       ADC_SAMPLETIME_13CYCLES_5, 13.5��ADCʱ������     ADC_SAMPLETIME_28CYCLES_5, 28.5��ADCʱ������
- *   @arg       ADC_SAMPLETIME_41CYCLES_5, 41.5��ADCʱ������     ADC_SAMPLETIME_55CYCLES_5, 55.5��ADCʱ������
- *   @arg       ADC_SAMPLETIME_71CYCLES_5, 71.5��ADCʱ������     ADC_SAMPLETIME_239CYCLES_5, 239.5��ADCʱ������
- * @param       rank: ��ͨ���ɼ�ʱ��Ҫ���õĲɼ����,
-                �����㶨��channle1��rank=1��channle2 ��rank=2��
-                ��ô��Ӧ����DMA����ռ�ı�������AdcDMA[0] ��i��channle1��ת�������AdcDMA[1]����ͨ��2��ת������� 
-                ��ͨ��DMA����Ϊ ADC_REGULAR_RANK_1
- *   @arg       ���1~16��ADC_REGULAR_RANK_1~ADC_REGULAR_RANK_16
- * @retval      ��
+ * @brief       设置ADC通道和采样时间
+ * @param       adc_handle: ADC句柄指针
+ * @param       ch: 通道号, ADC_CHANNEL_0~ADC_CHANNEL_17
+ * @param       rank: 采样顺序, ADC_REGULAR_RANK_1~ADC_REGULAR_RANK_16
+ * @param       stime: 采样时间, 如ADC_SAMPLETIME_239CYCLES_5
+ * @retval      无
  */
 void adc_channel_set(ADC_HandleTypeDef *adc_handle, uint32_t ch, uint32_t rank, uint32_t stime)
 {
     ADC_ChannelConfTypeDef adc_ch_conf;
     
-    adc_ch_conf.Channel = ch;                            /* ͨ�� */
-    adc_ch_conf.Rank = rank;                             /* ���� */
-    adc_ch_conf.SamplingTime = stime;                    /* ����ʱ�� */
-    HAL_ADC_ConfigChannel(adc_handle, &adc_ch_conf);     /* ͨ������ */
+    adc_ch_conf.Channel = ch;                            /* 通道 */
+    adc_ch_conf.Rank = rank;                             /* 顺序 */
+    adc_ch_conf.SamplingTime = stime;                    /* 采样时间 */
+    HAL_ADC_ConfigChannel(adc_handle, &adc_ch_conf);     /* 通道配置 */
 }
 
 /**
- * @brief       ���ADCת����Ľ��
- * @param       ch: ͨ��ֵ 0~17��ȡֵ��ΧΪ��ADC_CHANNEL_0~ADC_CHANNEL_17
- * @retval      ��
+ * @brief       获取ADC转换结果 (用于TCRT5000红外传感器)
+ * @param       ch: 通道号, ADC_CHANNEL_0~ADC_CHANNEL_17
+ * @retval      ADC转换值 (0~4095), 值越小表示反射越强(有药品)
  */
 uint32_t adc_get_result(uint32_t ch)
 {
-    adc_channel_set(&hadc1 , ch, ADC_REGULAR_RANK_1, ADC_SAMPLETIME_239CYCLES_5);    /* ����ͨ�������кͲ���ʱ�� */
+    adc_channel_set(&hadc1, ch, ADC_REGULAR_RANK_1, ADC_SAMPLETIME_239CYCLES_5);    /* 设置通道和采样时间 */
 
-    HAL_ADC_Start(&hadc1);                            /* ����ADC */
-    HAL_ADC_PollForConversion(&hadc1, 10);            /* ��ѯת�� */
-    return (uint16_t)HAL_ADC_GetValue(&hadc1);        /* �������һ��ADC1�������ת����� */
+    HAL_ADC_Start(&hadc1);                            /* 启动ADC */
+    HAL_ADC_PollForConversion(&hadc1, 10);            /* 等待转换完成 */
+    return (uint16_t)HAL_ADC_GetValue(&hadc1);        /* 返回ADC转换结果 */
 }
 /* USER CODE END 1 */

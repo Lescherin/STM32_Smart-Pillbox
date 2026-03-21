@@ -133,19 +133,19 @@ uint8_t dht11_read_data(struct dht11_Struct *data)
 {
     uint8_t buf[5];
     uint8_t i;
-    dht11_reset();
+    dht11_reset();                      /* 复位DHT11 */
 
-    if (dht11_check() == 0)
+    if (dht11_check() == 0)             /* 检测DHT11响应 */
     {
-        for (i = 0; i < 5; i++)     /* 读取40位数据 */
+        for (i = 0; i < 5; i++)         /* 读取40位数据: 湿度整数+小数+温度整数+小数+校验和 */
         {
             buf[i] = dht11_read_byte();
         }
 
-        if ((buf[0] + buf[1] + buf[2] + buf[3]) == buf[4])
+        if ((buf[0] + buf[1] + buf[2] + buf[3]) == buf[4])  /* 校验数据 */
         {
-            data->humi = buf[0];
-            data->temp = buf[2];
+            data->humi = buf[0];        /* 湿度整数部分 */
+            data->temp = buf[2];        /* 温度整数部分 */
         }
     }
     else
